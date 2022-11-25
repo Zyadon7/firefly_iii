@@ -1,0 +1,164 @@
+version: '3.3'
+
+services:
+  firefly_app:
+    image: fireflyiii/core:latest
+    restart: always
+    volumes:
+      - firefly_iii_upload:/var/www/html/storage/upload
+    #env_file: .env
+    environment:
+      - ADLDAP_AUTH_FIELD=distinguishedname
+      - ADLDAP_AUTO_CONNECT=true
+      - ADLDAP_CONNECTION=default
+      - ADLDAP_CONNECTION_SCHEME=OpenLDAP
+      - ADLDAP_DISCOVER_FIELD=distinguishedname
+      - ADLDAP_FOLLOW_REFFERALS=false
+      - ADLDAP_LOGIN_FALLBACK=false
+      - ADLDAP_PASSWORD_SYNC=false
+      - ADLDAP_PORT=389
+      - ADLDAP_SYNC_FIELD=userprincipalname
+      - ADLDAP_TIMEOUT=5
+      - ADLDAP_USE_SSL=false
+      - ADLDAP_USE_TLS=false
+      - APP_DEBUG=false
+      - APP_ENV=local
+      - APP_KEY=${APP_KEY}
+      - APP_LOG_LEVEL=notice
+      - APP_NAME=FireflyIII
+      - APP_URL=${APP_URL}
+      - AUTHENTICATION_GUARD=web
+      - BROADCAST_DRIVER=log
+      - CACHE_DRIVER=file
+      - CACHE_PREFIX=firefly
+      - CER_PROVIDER=ratesapi
+      - COOKIE_PATH=/
+      - COOKIE_SECURE=false
+      - DB_CONNECTION=${DB_CONNECTION}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_HOST=${DB_HOST}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DEFAULT_LANGUAGE=en_US
+      - DEFAULT_LOCALE=equal
+      - DISABLE_CSP_HEADER=false
+      - DISABLE_FRAME_HEADER=false
+      - DKR_CHECK_SQLITE=true
+      - DKR_RUN_MIGRATION=true
+      - DKR_RUN_PASSPORT_INSTALL=true
+      - DKR_RUN_REPORT=true
+      - DKR_RUN_UPGRADE=true
+      - DKR_RUN_VERIFY=true
+      - FIREFLY_III_LAYOUT=v1
+      - IS_HEROKU=false
+      - LOG_CHANNEL=stack
+      - LOGIN_PROVIDER=eloquent
+      - MANDRILL_SECRET=
+      - MAP_DEFAULT_LAT=51.983333
+      - MAP_DEFAULT_LONG=5.916667
+      - MAP_DEFAULT_ZOOM=6
+      - MYSQL_SSL_CAPATH=/etc/ssl/certs/
+      - MYSQL_SSL_VERIFY_SERVER_CERT=true
+      - MYSQL_USE_SSL=false
+      - NGINX_VERSION=1.21.1
+      - NJS_VERSION=0.6.1
+      - PGSQL_SSL_CERT=null
+      - PGSQL_SSL_CRL_FILE=null
+      - PGSQL_SSL_KEY=null
+      - PGSQL_SSL_MODE=prefer
+      - PGSQL_SSL_ROOT_CERT=null
+      - PHP_ASC_URL=https://www.php.net/distributions/php-8.0.10.tar.xz.asc
+      - PHP_EXTRA_BUILD_DEPS=apache2-dev
+      - PHP_EXTRA_CONFIGURE_ARGS=--with-apxs2 --disable-cgi
+      - PHP_SHA256=${PHP_SHA256}
+      - PHP_URL=https://www.php.net/distributions/php-8.0.10.tar.xz
+      - PHP_VERSION=8.0.10
+      - PKG_RELEASE=1
+      - PUSHER_ID=
+      - PUSHER_SECRET=
+      - QUEUE_DRIVER=sync
+      - REDIS_CACHE_DB=1
+      - REDIS_DB=0
+      - REDIS_HOST=127.0.0.1
+      - REDIS_PASSWORD=null
+      - REDIS_PORT=6379
+      - SEARCH_RESULT_LIMIT=50
+      - SEND_ERROR_MESSAGE=true
+      - SEND_REGISTRATION_MAIL=true
+      - SEND_REPORT_JOURNALS=true
+      - SEND_TELEMETRY=false
+      - SESSION_DRIVER=file
+      - SITE_OWNER=mail@example.com
+      - SPARKPOST_SECRET=
+      - TRACKER_SITE_ID=
+      - TRACKER_URL=
+      - TRUSTED_PROXIES=
+      - TZ=${TZ}
+      - USE_ENCRYPTION=false
+      - VERSION=5.6.2
+      - WINDOWS_SSO_DISCOVER=samaccountname
+      - WINDOWS_SSO_ENABLED=false
+      - WINDOWS_SSO_KEY=AUTH_USER
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      - FIREFLY_III_PATH=/var/www/html
+      - COMPOSER_ALLOW_SUPERUSER=1
+      - DEBIAN_FRONTEND=noninteractive
+      #- 'PHPIZE_DEPS=autoconf           dpkg-dev                file            g++             gcc             libc-dev                make            pkg-config
+      #                  re2c'
+      - PHP_INI_DIR=/usr/local/etc/php
+      - APACHE_CONFDIR=/etc/apache2
+      - APACHE_ENVVARS=/etc/apache2/envvars
+      #- PHP_CFLAGS=-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+      #- PHP_CPPFLAGS=-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE
+      #  -D_FILE_OFFSET_BITS=64
+      #- 'PHP_LDFLAGS=-Wl,-O1 -pie'
+      #- GPG_KEYS=1729F83938DA44E27BA0F4D3DBDB397470D12172 BFDDD28642824F8118EF77909B67A5C12229118F
+      - STATIC_CRON_TOKEN=9rnzWXp9a6aqaRDrYbNcTk3b8iSqCaSL
+    ports:
+      - ${FIREFLY_APP_PORT}:8080
+    depends_on:
+      - firefly_db
+
+  firefly_db:
+    image: mariadb:10.7  
+    restart: always
+    #env_file: .db.env
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      #- PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    volumes:
+      - firefly_iii_db:/var/lib/mysql
+  firefly_importer:
+    image: fireflyiii/data-importer:latest
+    restart: always
+    #env_file: .fidi.env
+    environment:
+      #- FIREFLY_III_CLIENT_ID=9VqCBaDy67qLSwggbOtmofHU1JNFfssFIub83Tse
+      - FIREFLY_III_URL=${FIREFLY_III_URL}
+      - VANITY_URL=${FIREFLY_III_URL}
+      - FIREFLY_III_ACCESS_TOKEN=${FIREFLY_III_ACCESS_TOKEN}
+      #- PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      #- FIREFLY_III_PATH=/var/www/html
+      #- COMPOSER_ALLOW_SUPERUSER=1
+      #- DEBIAN_FRONTEND=noninteractive
+      #- PHP_INI_DIR=/usr/local/etc/php
+      #- APACHE_CONFDIR=/etc/apache2
+      #- APACHE_ENVVARS=/etc/apache2/envvars
+      #- PHP_CFLAGS=-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+      #- PHP_VERSION=8.0.13
+      #- PHP_URL=https://www.php.net/distributions/php-8.0.13.tar.xz
+      #- PHP_ASC_URL=https://www.php.net/distributions/php-8.0.13.tar.xz.asc
+      #- PHP_SHA256=cd976805ec2e9198417651027dfe16854ba2c2c388151ab9d4d268513d52ed52
+      #- VERSION=3.0.0
+      #- IMPORTER=csv
+    ports:
+      - FIREFLY_DB_PORT:8080
+    depends_on:
+      - firefly_app
+volumes:
+  firefly_iii_upload:
+  firefly_iii_db:

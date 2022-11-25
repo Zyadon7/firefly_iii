@@ -1,0 +1,7 @@
+Static cron token
+
+https://docs.firefly-iii.org/firefly-iii/advanced-installation/cron/
+
+
+docker create --name=Firefly-Cronjob alpine sh -c "echo \"0 3 * * * wget -qO- http://192.168.1.152:8003/api/v1/cron/9rnzWXp9a6aqaRDrYbNcTk3b8iSqCaSL\" | crontab - && crond -f -L /dev/stdout"
+9f336f431127728b9bb97e9a81d6772c91d5f88ed44ecb5533869f4e45e77c98
