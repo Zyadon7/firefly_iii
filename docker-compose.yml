@@ -159,6 +159,14 @@ services:
       - FIREFLY_DB_PORT:8080
     depends_on:
       - firefly_app
+  Firefly-Cronjob:
+    command:
+      - "sh"
+      - "-c"
+      - "echo \"0 3 * * * wget -qO- ${FIREFLY_III_URL}/api/v1/cron/9rnzW                                                                                           Xp9a6aqaRDrYbNcTk3b8iSqCaSL\"\
+        \ | crontab - && crond -f -L /dev/stdout"
+    container_name: "Firefly-Cronjob"
+    image: "alpine:latest"
 volumes:
   firefly_iii_upload:
   firefly_iii_db:
